@@ -25,7 +25,8 @@ public class RobotMap {
 	public static int DOWN = -1;
 	public static int CUBE_IN = 1;
 	public static int CUBE_OUT = -1;
-	
+	public static int LEFT = -1;
+	public static int RIGHT = 1;
 	
 	public static final int DRIVER_USB_PORT_0 = 0;
 	public static final int ACTUATOR_USB_PORT_1 = 1;

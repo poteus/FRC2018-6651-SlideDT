@@ -8,42 +8,36 @@ import edu.wpi.first.wpilibj.command.Command;
  *
  */
 
-public class DriveTrain_SlideDrive extends Command {
-	
-    public DriveTrain_SlideDrive() {
-      requires(Robot.driveTrain);
+public class GrabberOUT extends Command {
+    
+	private int direction;
+    
+	public GrabberOUT() {
+    		requires(Robot.grabber);
     }
 
     // Called just before this Command runs the first time
     protected void initialize() {
-    	
     }
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
- 
-    		double forward = Robot.oi.DriverJoystick.getRawAxis(RobotMap.Xaxis); 
-    		double rotation = Robot.oi.DriverJoystick.getRawAxis(RobotMap.Rotation); 
-    		double slideSpeed = Robot.oi.DriverJoystick.getRawAxis(RobotMap.Yaxis);
-	
-    		Robot.driveTrain.drive(forward, rotation, slideSpeed);
+    		System.out.println("Direction: " + direction);
+    		Robot.grabber.grabber_move(RobotMap.CUBE_OUT);    			
     }
 
     // Make this return true when this Command no longer needs to run execute()
     protected boolean isFinished() {
-        return false;
-        
+    		return false;
     }
 
     // Called once after isFinished returns true
     protected void end() {
-    		Robot.driveTrain.drive(0, 0, 0);
-    	
     }
 
     // Called when another command which requires one or more of the same
     // subsystems is scheduled to run
     protected void interrupted() {
-    		Robot.driveTrain.drive(0, 0, 0);
+    		Robot.grabber.grabber_stop();
     }
 }

@@ -19,7 +19,7 @@ public class Grabber extends Subsystem {
         // setDefaultCommand(new Elevator());
     }
 	
-    public void grabber_move(int movement) {
+    public void grabber_move(double movement) {
     		grabberTalon1.set(movement*defaultSpeed);
     }
     
