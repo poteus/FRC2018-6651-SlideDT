@@ -1,7 +1,7 @@
 package org.usfirst.frc.team6651.robot;
 
 import org.usfirst.frc.team6651.robot.commands.AutoOutOfLine;
-import org.usfirst.frc.team6651.robot.commands.AutoSwitch;
+import org.usfirst.frc.team6651.robot.commands.AutoMode1;
 import org.usfirst.frc.team6651.robot.subsystems.DriveTrain;
 import org.usfirst.frc.team6651.robot.subsystems.Elevator;
 import org.usfirst.frc.team6651.robot.subsystems.Grabber;
@@ -28,11 +28,11 @@ public class Robot extends IterativeRobot {
     public void robotInit() {
 		oi = new OI();
 		
-		chooser = new SendableChooser();
-		chooser.addDefault("Default program", new AutoOutOfLine());
-		chooser.addObject("Default program", new AutoSwitch());
-		SmartDashboard.putData("Auto Mode", chooser);
-	//	autonomousCommand = new AutoOutOfLine();
+		// chooser = new SendableChooser();
+		// chooser.addDefault("Default program", new AutoOutOfLine());
+		// chooser.addObject("Default program", new AutoMode1());
+		// SmartDashboard.putData("Auto Mode", chooser);
+		autonomousCommand = new AutoMode1();
     }
 	
 
@@ -45,7 +45,7 @@ public class Robot extends IterativeRobot {
 	}
 
     public void autonomousInit() {  	
-        autonomousCommand = (Command) chooser.getSelected();
+        // autonomousCommand = (Command) chooser.getSelected();
         
     	// schedule the autonomous command (example)
         if (autonomousCommand != null) autonomousCommand.start(); 		

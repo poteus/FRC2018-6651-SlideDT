@@ -26,7 +26,7 @@ public class DriveTrain_SlideDrive extends Command {
     		double rotation = Robot.oi.DriverJoystick.getRawAxis(RobotMap.Rotation); 
     		double slideSpeed = Robot.oi.DriverJoystick.getRawAxis(RobotMap.Yaxis);
 	
-    		Robot.driveTrain.drive(forward, rotation, slideSpeed);
+    		Robot.driveTrain.drive(-forward, rotation, slideSpeed);
     }
 
     // Make this return true when this Command no longer needs to run execute()

@@ -4,6 +4,8 @@ import org.usfirst.frc.team6651.robot.Robot;
 import org.usfirst.frc.team6651.robot.RobotMap;
 
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
+import edu.wpi.first.wpilibj.AnalogGyro;
+import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.command.Command;
@@ -12,7 +14,7 @@ import edu.wpi.first.wpilibj.command.Command;
  *
  */
 
-public class AutoSwitch extends Command {
+public class AutoMode1 extends Command {
 	
 	// Encoders for distance
 	Encoder RightEncoder;
@@ -22,7 +24,7 @@ public class AutoSwitch extends Command {
 	double ticks_per_inch=250;
 	
 	// Gyro to straight and turn
-	ADXRS450_Gyro gyro;
+	ADXRS450_Gyro gyro = new ADXRS450_Gyro();;
 	double angle;
 	double kp=0.004;
 	double rotationSpeed=.2;
@@ -35,22 +37,24 @@ public class AutoSwitch extends Command {
 	double DistanceGoal1; // Distance for 1st trip
 	double DistanceGoal2; // Distance for 2nd trip
 	
-	double AutoChoice; // Choices between Cross Line, Switch or Scale
-	double AutoStage;  // Stage during the autonomous, ex: stage turning 90 degrees, etc. 
+	int AutoChoice; // Choices between Cross Line, Switch or Scale
+	int AutoStage;  // Stage during the autonomous, ex: stage turning 90 degrees, etc. 
 	
 	double direction; // 1 or -1 for Right or Left
-	String Side_Switch;
-	String Side_Scale;
+	char Side_Switch;
+	char Side_Scale;
 	String gameData = "";
-	String OurSide = "L"; // Side we are set up
+	char OurSide = 'L'; // Side we are set up
 	
-    public AutoSwitch() {
+    public AutoMode1() {
       requires(Robot.driveTrain);
     }
 
     // Called just before this Command runs the first time
     protected void initialize() {
-		reset_encoders();
+    		RightEncoder = new Encoder(0, 1, false, Encoder.EncodingType.k4X);
+    		LeftEncoder = new Encoder(2, 3, false, Encoder.EncodingType.k4X);
+    		reset_encoders();
 		// gyro.calibrate(); If Gyro does not reset
 		gyro.reset();
 		
@@ -73,14 +77,13 @@ public class AutoSwitch extends Command {
 			DistanceGoal2 = 0;
 			AutoChoice=0;
 		}
-		
-		direction = (OurSide.substring(0, 0)=="L") ? RobotMap.LEFT : RobotMap.RIGHT;
-    }
+		direction = OurSide=='L' ? RobotMap.LEFT : RobotMap.RIGHT;
+	}
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
 		AutoStage=detectStage();
-		
+		// System.out.println("AutoStage: " + AutoStage);
 		if (AutoStage == 0) drive_straight(.5);
 		if (AutoStage == 1) Robot.driveTrain.drive(0, direction*rotationSpeed, 0);
 		if (AutoStage == 2) drive_straight(.5);
@@ -126,22 +129,28 @@ public class AutoSwitch extends Command {
 		countRight = RightEncoder.get();
 		countLeft = LeftEncoder.get();
 		angle = gyro.getAngle();
-		
+		System.out.println("Encoders Right: " + countRight);
+		System.out.println("Encoders Left: " + countLeft);
 		DistanceTravelled = distance((countRight+countLeft)/2);
-    		if (DistanceTravelled<DistanceGoal1) {
+    		if (DistanceTravelled>DistanceGoal1 && AutoStage == 0) {
     			reset_encoders();
-    			return 0;
+    			return 1;
     		}
-    		else if(angle<90 && AutoChoice != 0) return 1;
-    		else if(DistanceTravelled<DistanceGoal2 && AutoChoice != 0) return 2;
-    		return 3;
+    		else if(angle>90 && AutoChoice != 0 && AutoStage == 1) {
+    			reset_encoders();
+    			return 2;
+    		}
+    		else if(DistanceTravelled>DistanceGoal2 && AutoChoice != 0 && AutoStage == 2) return 3;
+    		return AutoStage;
     }
     
-    public String GameDataSwitchDirection() {
-    		return gameData.substring(0, 0);
+    public char GameDataSwitchDirection() {
+    		// return gameData.substring(1, 1);
+    		return gameData.charAt(0);
     }
     
-    public String GameDataScaleDirection() {
-		return gameData.substring(1, 1);
+    public char GameDataScaleDirection() {
+    		return gameData.charAt(1);
+    		// return gameData.substring(1, 1);
     }
 }
