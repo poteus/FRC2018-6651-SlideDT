@@ -7,14 +7,10 @@
 
 package org.usfirst.frc.team6651.robot;
 
+import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.IterativeRobot;
-import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.Spark;
-import edu.wpi.first.wpilibj.SpeedControllerGroup;
-import edu.wpi.first.wpilibj.drive.DifferentialDrive;
-import edu.wpi.first.wpilibj.ADXRS450_Gyro;
-import edu.wpi.first.wpilibj.Encoder;
-
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -24,38 +20,23 @@ import edu.wpi.first.wpilibj.Encoder;
  * project.
  */
 public class Robot extends IterativeRobot {
+	private static final String kDefaultAuto = "Default";
+	private static final String kCustomAuto = "My Auto";
+	private String m_autoSelected;
+	private SendableChooser<String> m_chooser = new SendableChooser<>();
+	AnalogInput ai;
 	
-	public static DifferentialDrive DT;
-	Spark slider;
-	Joystick PS4 = new Joystick(0);
-	Encoder RightEncoder;
-	Encoder LeftEncoder;
-	int countRight, previousRight;
-	int countLeft, previousLeft;
-	double ticks_per_inch=250;
-	
-	ADXRS450_Gyro gyro;
-	double angle;
-	double kp=0.004;
-	
+	/**
+	 * This function is run when the robot is first started up and should be
+	 * used for any initialization code.
+	 */
 	@Override
-	public void robotInit() {
-		Spark rightFront = new Spark(1);
-		Spark rightBack = new Spark(2);
-		SpeedControllerGroup m_right = new SpeedControllerGroup(rightFront, rightBack);
-		Spark leftFront = new Spark(4);
-		Spark leftBack = new Spark(5);
-		SpeedControllerGroup m_left = new SpeedControllerGroup(leftFront, leftBack);
-		m_left.setInverted(false);
-		DT = new DifferentialDrive(m_right, m_left);	
-		slider = new Spark(6);
+	public void robotInit() {		
+		m_chooser.addDefault("Default Auto", kDefaultAuto);
+		m_chooser.addObject("My Auto", kCustomAuto);
+		SmartDashboard.putData("Auto choices", m_chooser);
 		
-		RightEncoder = new Encoder(0, 1, false, Encoder.EncodingType.k4X);
-		LeftEncoder = new Encoder(2, 3, false, Encoder.EncodingType.k4X);
-		RightEncoder.reset();
-		LeftEncoder.reset();
-		
-		gyro = new ADXRS450_Gyro();
+		ai = new AnalogInput(0);
 	}
 
 	/**
@@ -71,34 +52,26 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void autonomousInit() {
-		DT.arcadeDrive(0,0);
-		RightEncoder.reset();
-		LeftEncoder.reset();
-		// gyro.calibrate();
-		gyro.reset();
+		m_autoSelected = m_chooser.getSelected();
+		// autoSelected = SmartDashboard.getString("Auto Selector",
+		// defaultAuto);
+		System.out.println("Auto selected: " + m_autoSelected);
 	}
-	
-	public int distance_reached(int encoder_value, double distance)
-	{
-		int reach = 0;
-			if( encoder_value/ticks_per_inch>distance)
-				reach = 1;
-		return reach;
-	}
+
 	/**
 	 * This function is called periodically during autonomous.
 	 */
 	@Override
 	public void autonomousPeriodic() {
-		double distance;
-		countRight = RightEncoder.get();
-		countLeft = LeftEncoder.get();
-		angle = gyro.getAngle();
-		if(distance_reached(countRight,12) == 1)
-		{
-			DT.tankDrive(0,0);
+		switch (m_autoSelected) {
+			case kCustomAuto:
+				// Put custom auto code here
+				break;
+			case kDefaultAuto:
+			default:
+				// Put default auto code here
+				break;
 		}
-		else DT.arcadeDrive(-.55,.2+(-angle*kp)); // .2 to compensate power of left engines
 	}
 
 	/**
@@ -106,22 +79,14 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void teleopPeriodic() {
-		int Y_axis = 1, X_axis = 0, Rotation = 2, Throttle = 3;
-		double Forward = PS4.getRawAxis(Y_axis); 
-		double Turn = PS4.getRawAxis(Rotation); 
-		DT.arcadeDrive(Forward,Turn);
+		int raw = ai.getValue();
+		double kdistance = 5*1024*2.54;
+		double volts = ai.getVoltage();
+		int averageRaw = ai.getAverageValue();
+		double averageVolts = ai.getAverageVoltage();
 		
-		double slideSpeed = PS4.getRawAxis(X_axis);
-		slider.set(slideSpeed);
-		
-		countRight = RightEncoder.get();
-		countLeft = LeftEncoder.get();
-		if(previousRight != countRight || previousLeft != countLeft)
-		{
-			System.out.println("Encoders: " + countLeft + " " + countRight);
-			previousRight = countRight;
-			previousLeft = countLeft;
-		}
+		System.out.println("volts " + volts + " voltsDistance: " + volts*67.8615);
+
 	}
 
 	/**

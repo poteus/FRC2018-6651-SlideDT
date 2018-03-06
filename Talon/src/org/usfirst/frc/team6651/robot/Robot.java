@@ -7,11 +7,14 @@
 
 package org.usfirst.frc.team6651.robot;
 
-import com.ctre.phoenix.motorcontrol.can.*;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.wpilibj.IterativeRobot;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.Spark;
+import edu.wpi.first.wpilibj.SpeedControllerGroup;
+import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -21,21 +24,25 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * project.
  */
 public class Robot extends IterativeRobot {
-	private static final String kDefaultAuto = "Default";
-	private static final String kCustomAuto = "My Auto";
-	private String m_autoSelected;
-	private SendableChooser<String> m_chooser = new SendableChooser<>();
 	
-	WPI_TalonSRX Talon10 = new WPI_TalonSRX(10);
-	/**
-	 * This function is run when the robot is first started up and should be
-	 * used for any initialization code.
-	 */
+	// public static DifferentialDrive DT;
+	// Spark slider;
+	Joystick PS4 = new Joystick(0);
+	WPI_TalonSRX talon15;
+	WPI_TalonSRX talon16;
+	
+	
 	@Override
-	public void robotInit() {		
-		m_chooser.addDefault("Default Auto", kDefaultAuto);
-		m_chooser.addObject("My Auto", kCustomAuto);
-		SmartDashboard.putData("Auto choices", m_chooser);
+	public void robotInit() {
+		talon15 = new WPI_TalonSRX(17);
+		talon16 = new WPI_TalonSRX(16);
+		// SpeedControllerGroup m_right = new SpeedControllerGroup(rightFront, rightBack);
+		// Spark leftFront = new Spark(4);
+		// Spark leftBack = new Spark(5);
+		// SpeedControllerGroup m_left = new SpeedControllerGroup(leftFront, leftBack);
+		// m_left.setInverted(false);
+		// DT = new DifferentialDrive(m_right, m_left);	
+		// slider = new Spark(6);
 	}
 
 	/**
@@ -51,10 +58,7 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void autonomousInit() {
-		m_autoSelected = m_chooser.getSelected();
-		// autoSelected = SmartDashboard.getString("Auto Selector",
-		// defaultAuto);
-		System.out.println("Auto selected: " + m_autoSelected);
+		
 	}
 
 	/**
@@ -62,15 +66,7 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void autonomousPeriodic() {
-		switch (m_autoSelected) {
-			case kCustomAuto:
-				// Put custom auto code here
-				break;
-			case kDefaultAuto:
-			default:
-				// Put default auto code here
-				break;
-		}
+
 	}
 
 	/**
@@ -78,7 +74,14 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void teleopPeriodic() {
-		Talon10.set(0.2);
+		int X_axis = 1, Y_axis = 0, Rotation = 2, Throttle = 3;
+		double left = PS4.getRawAxis(X_axis); 
+		// double right = PS4.getRawAxis(Rotation); 
+		// DT.tankDrive(left,right);
+		
+		// double slideSpeed = PS4.getRawAxis(Y_axis);
+		talon15.set(left);
+		talon16.set(-left);
 	}
 
 	/**
@@ -86,6 +89,5 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void testPeriodic() {
-		Talon10.set(0.2);
 	}
 }

@@ -41,5 +41,4 @@ public class DriveTrain extends Subsystem {
     		Robot.driveTrain.slideMotor1.set(slide);
     		// system.out.println("Drive: " + forward + " " + turn + " " + slide);
     }
-
 }

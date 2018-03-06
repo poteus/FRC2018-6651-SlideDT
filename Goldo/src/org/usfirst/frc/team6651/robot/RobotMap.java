@@ -41,4 +41,8 @@ public class RobotMap {
 	public static int GRABBER_TALON_2 = 17;
 	
 	public static int ELEVATOR_CIM = 18;
-}
+
+	public static double defaultSpeed = 0.5;
+	public static double HoldSpeed=0.2;
+}	
+	

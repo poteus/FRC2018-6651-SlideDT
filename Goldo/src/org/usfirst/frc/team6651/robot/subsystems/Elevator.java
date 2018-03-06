@@ -10,8 +10,7 @@ import edu.wpi.first.wpilibj.command.Subsystem;
 public class Elevator extends Subsystem {
 	
 	WPI_TalonSRX elevatorTalon = new WPI_TalonSRX(RobotMap.ELEVATOR_CIM);
-	double defaultSpeed=0.5;
-	double HoldSpeed=0.2; /* to be done with encoders or break system */
+
  
     public void initDefaultCommand() {
         // Set the default command for a subsystem here.
@@ -27,15 +26,15 @@ public class Elevator extends Subsystem {
     }
     
     public void hold_position() {
-		elevatorTalon.set(HoldSpeed);
+		elevatorTalon.set(RobotMap.HoldSpeed);
     }
     
     public void elevator_up() {
-		elevatorTalon.set(defaultSpeed);
+		elevatorTalon.set(RobotMap.defaultSpeed);
     }
     
     public void elevator_down() {
-		elevatorTalon.set(-defaultSpeed);
+		elevatorTalon.set(-RobotMap.defaultSpeed);
     }
 
 }

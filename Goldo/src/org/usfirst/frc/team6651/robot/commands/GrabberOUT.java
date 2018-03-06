@@ -22,7 +22,7 @@ public class GrabberOUT extends Command {
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
-    		System.out.println("Direction: " + direction);
+    		// System.out.println("Direction: " + direction);
     		Robot.grabber.grabber_move(RobotMap.CUBE_OUT);    			
     }
 
