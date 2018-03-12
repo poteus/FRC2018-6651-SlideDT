@@ -1,6 +1,8 @@
 package org.usfirst.frc.team6651.robot.commands;
 
 import org.usfirst.frc.team6651.robot.Robot;
+
+import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.command.Command;
 
 /**
@@ -9,6 +11,11 @@ import edu.wpi.first.wpilibj.command.Command;
 
 public class ElevatorDOWN extends Command {
   
+	Encoder ElevatorEncoder;
+	double countElevator, Bottom=0;
+	
+	double Max_Speed = 1;
+	
 	public ElevatorDOWN() {
     		requires(Robot.elevator);
     }
@@ -19,7 +26,11 @@ public class ElevatorDOWN extends Command {
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
-    			Robot.elevator.elevator_down();
+    	countElevator = ElevatorEncoder.get();
+		if(countElevator<(Bottom*0.9))
+			Robot.elevator.elevator_down(Max_Speed);
+		else if(countElevator<Bottom)
+			Robot.elevator.elevator_down(Max_Speed/2);
     }
 
     // Make this return true when this Command no longer needs to run execute()

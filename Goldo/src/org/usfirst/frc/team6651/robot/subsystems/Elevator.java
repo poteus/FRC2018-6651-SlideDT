@@ -11,7 +11,6 @@ public class Elevator extends Subsystem {
 	
 	WPI_TalonSRX elevatorTalon = new WPI_TalonSRX(RobotMap.ELEVATOR_CIM);
 
- 
     public void initDefaultCommand() {
         // Set the default command for a subsystem here.
         // setDefaultCommand(new Elevator());
@@ -29,12 +28,12 @@ public class Elevator extends Subsystem {
 		elevatorTalon.set(RobotMap.HoldSpeed);
     }
     
-    public void elevator_up() {
-		elevatorTalon.set(RobotMap.defaultSpeed);
+    public void elevator_up(double speed) {
+		elevatorTalon.set(speed);
     }
     
-    public void elevator_down() {
-		elevatorTalon.set(-RobotMap.defaultSpeed);
+    public void elevator_down(double speed) {
+		elevatorTalon.set(-speed);
     }
 
 }

@@ -10,9 +10,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.command.Command;
 
-/**
- *
- */
 
 public class AutoMode2 extends Command {
 	
@@ -95,7 +92,7 @@ public class AutoMode2 extends Command {
 		if (AutoStage == 0) drive_straight(.5);
 		if (AutoStage == 1) Robot.driveTrain.drive(0, direction*rotationSpeed, 0);
 		if (AutoStage == 2) drive_straight(.5);
-		if (AutoStage == 3) Robot.elevator.elevator_up();
+		if (AutoStage == 3) Robot.elevator.elevator_up(1);
 		if (AutoStage == 4) Robot.grabber.grabber_move(RobotMap.CUBE_OUT);
 		
     }

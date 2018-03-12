@@ -10,8 +10,6 @@ import edu.wpi.first.wpilibj.command.Command;
 
 public class GrabberOUT extends Command {
     
-	private int direction;
-    
 	public GrabberOUT() {
     		requires(Robot.grabber);
     }
