@@ -24,7 +24,7 @@ public class AutoMode1 extends Command {
 	double ticks_per_inch=250;
 	
 	// Gyro to straight and turn
-	ADXRS450_Gyro gyro = new ADXRS450_Gyro();;
+	ADXRS450_Gyro gyro = new ADXRS450_Gyro();
 	double angle;
 	double kp=0.004;
 	double rotationSpeed=.2;

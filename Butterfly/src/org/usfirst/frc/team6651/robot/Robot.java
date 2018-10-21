@@ -9,14 +9,12 @@ package org.usfirst.frc.team6651.robot;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
+import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.buttons.Button;
-import edu.wpi.first.wpilibj.buttons.JoystickButton;
-import edu.wpi.first.wpilibj.drive.DifferentialDrive;
-
+import edu.wpi.first.wpilibj.drive.MecanumDrive;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -27,14 +25,22 @@ import edu.wpi.first.wpilibj.drive.DifferentialDrive;
  */
 public class Robot extends IterativeRobot {
 	
-	public static DifferentialDrive DT;
-	// Spark slider;
-	Joystick PS4 = new Joystick(0);
-	// int buttonButterflyId = 1;
-	// Button butterflyButton = new JoystickButton(PS4, buttonButterflyId);
-	Button butterflyButtonUp = new JoystickButton(PS4, 1);
-	Button butterflyButtonDown = new JoystickButton(PS4, 2);
+	// public static DifferentialDrive DT;
+	public static MecanumDrive DTMec;
 	
+	ADXRS450_Gyro gyro = new ADXRS450_Gyro();
+	// Gyro gyro = new AnalogGyro(0);
+	double angle;
+	double kp=0.004;
+	double tick_per_degree=0.000144114;
+	
+	Joystick PS4 = new Joystick(0);
+	int butterflyButtonId = 1;
+	// Button butterflyButtonChange = new JoystickButton(PS4, butterflyButtonId);
+	// Button butterflyButtonUp = new JoystickButton(PS4, 1);
+	// Button butterflyButtonDown = new JoystickButton(PS4, 2);
+	
+	double MAXPOWER=0.75;
 	WPI_TalonSRX talon10;
 	WPI_TalonSRX talon11;
 	WPI_TalonSRX talon12;
@@ -43,7 +49,8 @@ public class Robot extends IterativeRobot {
 	Compressor c;
 	DoubleSolenoid butterflySolenoid;
 	boolean changeOfState = true;
-	boolean butterflyState = false;
+	DoubleSolenoid.Value UP=DoubleSolenoid.Value.kForward, DOWN=DoubleSolenoid.Value.kReverse;
+	DoubleSolenoid.Value butterflyState = DOWN;
 
 	// c.setClosedLoopControl(true);  // Start compressor control
 	// c.setClosedLoopControl(false); // Stop compressor control
@@ -53,18 +60,24 @@ public class Robot extends IterativeRobot {
 	public void robotInit() {
 		talon10 = new WPI_TalonSRX(10);
 		talon12 = new WPI_TalonSRX(12);
-		talon12.follow(talon10);
+		//SpeedControllerGroup left = new SpeedControllerGroup(talon10, talon12);
+
 		talon11 = new WPI_TalonSRX(11);
 		talon13 = new WPI_TalonSRX(13);
-		talon13.follow(talon11);
+		//SpeedControllerGroup right = new SpeedControllerGroup(talon11, talon13);
 		
-		DT = new DifferentialDrive(talon10, talon11);
+		// DT = new DifferentialDrive(left, right);
+		DTMec = new MecanumDrive(talon10, talon11, talon12, talon13);
 		
 		c = new Compressor(0);
 		c.setClosedLoopControl(true);  // Start compressor control
 		
 		butterflySolenoid = new DoubleSolenoid(0, 1);
-		butterflySolenoid.set(DoubleSolenoid.Value.kForward);	
+		butterflySolenoid.set(butterflyState);
+
+		// gyro.calibrate();
+		gyro.reset();
+
 	}
 
 	/**
@@ -96,30 +109,89 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void teleopPeriodic() {
-		int X_axis = 1, Y_axis = 0, Rotation = 2, Throttle = 3;
-		double forward = PS4.getRawAxis(X_axis); 
-		double turn = PS4.getRawAxis(Y_axis); 
-		DT.arcadeDrive(forward, -turn);
-/*
-		if (PS4.getRawButton(buttonButterflyId) == true && changeOfState == true) {
-			System.out.println("Button pushed");
-			if (butterflyState == false)
-				butterflySolenoid.set(DoubleSolenoid.Value.kForward);
-			else
-				butterflySolenoid.set(DoubleSolenoid.Value.kReverse);
-			butterflyState = !butterflyState;
-			changeOfState = false;
-		}
-		if (PS4.getRawButton(buttonButterflyId) == false && changeOfState == false) {
-			changeOfState = true;
-		}*/
+		int X_axis = 1, Y_axis = 0, Z_axis = 2;
+		double power=0.8*MAXPOWER;
+		double forward = PS4.getRawAxis(X_axis)*MAXPOWER; 
+		double slide = PS4.getRawAxis(Y_axis)*MAXPOWER; 
+		double turn = PS4.getRawAxis(Z_axis)*MAXPOWER;
+		int POV = PS4.getPOV();
+		angle = gyro.getAngle();
+		// System.out.println("Angle at: " + angle + "    The angle: " + (int)(angle/tick_per_degree));
 		
-		if (PS4.getRawButton(1) == true) {
+		if (butterflyState == DOWN)
+			// DT.arcadeDrive(forward, -slide);
+			DTMec.driveCartesian(forward, 0, -slide);
+		else {
+			if (POV != -1) System.out.println("POV " + POV);
+			switch(POV)
+				{
+					case 0:
+						forward = -power; 
+						turn = 0;
+						slide = 0;
+						break;
+					case 45:
+						forward = -power; 
+						turn = 0;
+						slide = power;
+						break;
+					case 90:
+						forward = 0; 
+						turn = 0;
+						slide = power;
+						break;
+					case 135:
+						forward = power; 
+						turn = 0;
+						slide = power;
+						break;
+					case 180:
+						forward = power; 
+						turn = 0;
+						slide = 0;
+						break;
+					case 225:
+						forward = power; 
+						turn = 0;
+						slide = -power;
+						break;
+					case 270:
+						forward = 0; 
+						turn = 0;
+						slide = -power;
+						break;
+					case 315:
+						forward = -power; 
+						turn = 0;
+						slide = -power;
+						break;
+					case -1:
+						break;
+				}
+			// System.out.println(POV);
+			DTMec.driveCartesian(forward, -slide, -turn);
+		}
+
+		if (PS4.getRawButton(butterflyButtonId) == true && changeOfState == true) {
+			// System.out.println("Button pushed");
+			if (butterflyState == DOWN) butterflyState = UP;
+			else 						butterflyState = DOWN;
+			changeOfState = false;
+			butterflySolenoid.set(butterflyState);
+		}
+		
+		//  Reset state
+		if (PS4.getRawButton(butterflyButtonId) == false && changeOfState == false)  changeOfState = true;
+
+		
+
+		// 2 buttons control - one to go up, one to go down
+		/* if (PS4.getRawButton(1) == true) {
 			butterflySolenoid.set(DoubleSolenoid.Value.kForward);
 		}
 		if (PS4.getRawButton(1) == false && PS4.getRawButton(2) == true) {
 			butterflySolenoid.set(DoubleSolenoid.Value.kReverse);
-		}
+		}*/
 	}
 
 	/**

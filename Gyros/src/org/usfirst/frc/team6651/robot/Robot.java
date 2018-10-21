@@ -7,7 +7,8 @@
 
 package org.usfirst.frc.team6651.robot;
 
-import edu.wpi.first.wpilibj.AnalogGyro;
+import edu.wpi.first.wpilibj.ADXRS450_Gyro;
+// import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Spark;
@@ -25,10 +26,10 @@ import edu.wpi.first.wpilibj.interfaces.Gyro;
  */
 public class Robot extends IterativeRobot {
 	
-	public static DifferentialDrive DT;
-	Spark slider;
-	Joystick PS4 = new Joystick(0);
-	Gyro gyro;
+	// public static DifferentialDrive DT;
+	// Spark slider;
+	// Joystick PS4 = new Joystick(0);
+	ADXRS450_Gyro gyro = new ADXRS450_Gyro();
 	
 	double angle;
 	double tick_per_degree=0.000144114;
@@ -36,17 +37,19 @@ public class Robot extends IterativeRobot {
 	
 	@Override
 	public void robotInit() {
-		Spark rightFront = new Spark(1);
-		Spark rightBack = new Spark(2);
-		SpeedControllerGroup m_right = new SpeedControllerGroup(rightFront, rightBack);
-		Spark leftFront = new Spark(4);
-		Spark leftBack = new Spark(5);
-		SpeedControllerGroup m_left = new SpeedControllerGroup(leftFront, leftBack);
-		m_left.setInverted(false);
-		DT = new DifferentialDrive(m_right, m_left);	
-		slider = new Spark(6);
-		
-		gyro = new AnalogGyro(0);
+		// Spark rightFront = new Spark(1);
+		// Spark rightBack = new Spark(2);
+		// SpeedControllerGroup m_right = new SpeedControllerGroup(rightFront, rightBack);
+		// Spark leftFront = new Spark(4);
+		// Spark leftBack = new Spark(5);
+		// SpeedControllerGroup m_left = new SpeedControllerGroup(leftFront, leftBack);
+		// m_left.setInverted(false);
+		// DT = new DifferentialDrive(m_right, m_left);	
+		// slider = new Spark(6);
+
+        // gyro.calibrate();
+        gyro.reset();
+		// gyro.calibrate();
 		
 	}
 
@@ -63,8 +66,9 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void autonomousInit() {
-		DT.tankDrive(0,0);
-		gyro.reset();
+		// DT.tankDrive(0,0);
+		// gyro.reset();
+		gyro.calibrate();
 	}
 	
 	/**
@@ -74,12 +78,12 @@ public class Robot extends IterativeRobot {
 	public void autonomousPeriodic() {
 		angle = gyro.getAngle();
 		System.out.println("Angle at: " + angle + "    The angle: " + (int)(angle/tick_per_degree));
-		if((angle/tick_per_degree)>90)
-		{
-			DT.tankDrive(0,0);
-			System.out.println("Stop at: " + angle);
-		}
-		else DT.tankDrive(.5,-.5);
+		// if((angle/tick_per_degree)>90)
+		// {
+		// 	DT.tankDrive(0,0);
+		//	System.out.println("Stop at: " + angle);
+		//}
+		//else DT.tankDrive(.5,-.5);
 	}
 
 	/**
@@ -87,10 +91,12 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void teleopPeriodic() {
-		int X_axis = 1, Y_axis = 0, Rotation = 2, Throttle = 3;
-		double forward = PS4.getRawAxis(X_axis); 
-		double turn = PS4.getRawAxis(Y_axis); 
-		DT.arcadeDrive(forward,turn);
+		angle = gyro.getAngle();
+		System.out.println("Angle at: " + angle + "    The angle: " + (int)(angle/tick_per_degree));
+		// int X_axis = 1, Y_axis = 0, Rotation = 2, Throttle = 3;
+		// double forward = PS4.getRawAxis(X_axis); 
+		// double turn = PS4.getRawAxis(Y_axis); 
+		// DT.arcadeDrive(forward,turn);
 	}
 
 	/**
